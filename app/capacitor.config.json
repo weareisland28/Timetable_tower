@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.timetabletower.app",
+  "appName": "시간표 탑",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#F5F1E8"
+  }
+}

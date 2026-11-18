@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>오늘의 시간표 탑</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F5F1E8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link id="font-link" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style id="app-style">
 :root{--bg:#F5F1E8;--ink:#2B2D33;--muted:#7A7466;--line:#E4DED0;--green:#2E9E6A;--blue:#3B7DD8;--purple:#8A5CC9;--orange:#F07F35}
@@ -290,6 +296,7 @@ label.btn{cursor:pointer}
 .join-form .txt{flex:1;min-width:0}
 .code-in{text-transform:uppercase;letter-spacing:3px;font-family:'Jua',sans-serif;font-size:28px;text-align:center}
 .big2{font-size:22px;padding:14px 24px;justify-content:center}
+.apk-link{font-size:15px;color:var(--blue);text-decoration:none;margin-top:4px}
 .join-err{background:#FDEBE3;color:#B4471F;border-radius:14px;padding:10px 14px;font-size:16px;width:100%}
 .lbl3{font-family:'Jua',sans-serif;font-size:17px;text-align:left;color:var(--muted)}
 .menu-col{display:flex;flex-direction:column;gap:10px}
@@ -552,8 +559,14 @@ function renderJoin(msg){
     '<p class="join-sub">선생님이 알려준 코드를 넣으면 이 기기가 우리 반과 연결돼요</p>'+
     '<form id="join-form" class="join-form"><input class="txt code-in" id="f-code" maxlength="32" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="예) DINO2026" value="'+esc(lsGet(LS_CODE)||'')+'"><button class="btn primary big2" type="submit">연결하기</button></form>'+
     (msg?'<div class="join-err">'+esc(msg)+'</div>':'')+
-    '<button class="btn ghost-btn" data-act="go-login">👩‍🏫 선생님으로 로그인</button></div></div>';
+    '<button class="btn ghost-btn" data-act="go-login">👩‍🏫 선생님으로 로그인</button>'+apkLinkHTML()+'</div></div>';
 }
+function apkUrl(){
+  var h=location.hostname,m=h.match(/^([^.]+)\.github\.io$/);if(!m)return '';
+  var repo=(location.pathname.split('/')[1]||'');
+  return repo?'https://github.com/'+m[1]+'/'+repo+'/releases/latest/download/timetable-tower.apk':'';
+}
+function apkLinkHTML(){var u=apkUrl();return u?'<a class="apk-link" href="'+esc(u)+'">📱 안드로이드 앱(APK) 내려받기</a>':''}
 function renderLogin(msg){
   view='login';closeOverlay();
   app.innerHTML='<div class="pick join"><div class="join-box">'+
@@ -577,7 +590,7 @@ function renderCreateClass(msg){
 function afterTeacherLogin(){
   renderLoading('교실 정보를 불러오고 있어요…');
   sb.from('classrooms').select('id,name,join_code').order('created_at').then(function(r){
-    if(r.error){renderLogin('교실 정보를 불러오지 못했어요. setup.sql을 실행했는지 확인해 주세요.');return}
+    if(r.error){renderLogin('교실 정보를 불러오지 못했어요. 최신 setup.sql을 실행했는지 확인해 주세요. ('+(r.error.code||'')+' '+(r.error.message||'')+')');return}
     var c=(r.data||[])[0];
     if(!c){renderCreateClass();return}
     ssSet(SS_TEACHER,JSON.stringify({tab:T.tab||'live'}));
@@ -1136,6 +1149,7 @@ var rzT=null;window.addEventListener('resize',function(){clearTimeout(rzT);rzT=s
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&ov)updateTimer()});
 
 /* ================= 시작 ================= */
+try{if('serviceWorker' in navigator&&location.protocol==='https:'&&location.hostname!=='localhost'&&!window.Capacitor)navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}
 renderLoading();
 (function(){
   if(!configured()){startLocal();return}
