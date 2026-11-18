@@ -10,6 +10,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'config.js'
       - 'app/**'
       - '.github/workflows/build-apk.yml'
 
@@ -40,6 +41,7 @@ jobs:
         run: |
           rm -rf www && mkdir -p www/icons
           cp ../index.html www/index.html
+          cp ../config.js www/config.js
           cp ../icons/*.png www/icons/ 2>/dev/null || true
           cp node_modules/@supabase/supabase-js/dist/umd/supabase.js www/supabase.js
           sed -i 's#https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2#supabase.js#' www/index.html
