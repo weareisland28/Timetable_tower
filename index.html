@@ -66,7 +66,13 @@ button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:n
 .fnum{position:absolute;left:-34px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #D8CFBC;color:#9A8F78;font-family:'Jua',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center}
 .tower-wrap.dragover{background:rgba(255,190,120,.15)}
 .signs,.tower{position:relative;height:100%}
-.pole{position:absolute;left:24px;bottom:-14px;width:10px;background:#B9A88A;border-radius:5px}
+.pole{position:absolute;left:24px;bottom:-14px;width:10px;background:#B9A88A;border-radius:5px;transition:height .6s ease}
+.sign.sign-in{animation:signIn .6s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes signIn{from{transform:translateX(-46px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.sign.sign-out{animation:signOut .55s ease-in forwards;pointer-events:none;z-index:0}
+@keyframes signOut{to{transform:translateX(-56px) scale(.7);opacity:0}}
+.sign.last{z-index:2}
+.sign.last span{box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 3px #fff}
 .sign{position:absolute;left:0;right:0;display:flex;align-items:center}
 .sign span{position:relative;display:flex;align-items:center;padding-left:16px;height:62%;min-height:40px;max-height:64px;width:100%;background:var(--sc);color:#fff;font-family:'Jua',sans-serif;font-size:26px;clip-path:polygon(0 0,78% 0,100% 50%,78% 100%,0 100%);box-shadow:inset 0 -4px 0 rgba(0,0,0,.15)}
 .floor{position:absolute;left:0;right:0}
@@ -306,17 +312,8 @@ label.btn{cursor:pointer}
 .cls-box .txt{flex:1;min-width:160px;font-size:18px;padding:8px 12px}
 .code-show{font-family:'Jua',sans-serif;font-weight:normal;font-size:26px;letter-spacing:3px;background:#F3EFE6;padding:4px 14px;border-radius:12px}
 </style>
-<script>
-/* =====================================================================
-   ★ Supabase 연결 정보 ★
-   안내서의 "앱에 연결 정보 넣기" 단계에서 복사한 두 값을
-   아래 따옴표 안에 붙여넣으세요. (나머지 코드는 고치지 않아도 돼요)
-   ===================================================================== */
-window.TT_CONFIG = {
-  SUPABASE_URL: 'https://imkgsapvtmgtqhyeghvl.supabase.co',
-  SUPABASE_ANON_KEY: 'sb_publishable_FIQFpI7egfx85_YkjEBSFg_-DCfAQeT'
-};
-</script>
+<!-- Supabase 연결 정보는 config.js 파일에 있어요 (index.html을 업데이트해도 그대로 유지돼요) -->
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -689,7 +686,7 @@ function renderPick(){
 function whoHTML(){var s=getStudent(deviceSid);return s?esc(s.emoji)+' '+esc(s.name):''}
 function enterStudent(){
   view='student';closeOverlay();
-  S=normSession(sessions[deviceSid]);
+  S=normSession(sessions[deviceSid]);prevSigns=null;prevPoleH=null;
   renderStudent();
   if(S.act)openOverlay(S.act,false);
 }
@@ -712,6 +709,39 @@ function renderPalette(){
     '<h2><span class="dot" style="background:#3B7DD8"></span>수업 시간</h2><div class="plist">'+plist(vis.filter(function(b){return b.type==='class'}))+'</div>'+
     '<h2><span class="dot" style="background:#F07F35"></span>쉬는 시간</h2><div class="plist">'+plist(vis.filter(function(b){return b.type!=='class'}))+'</div>';
 }
+
+/* 표지판: 쌓는 동안엔 먼저/다음에/나중에, 완성 후엔 맨 위 블록에 '마지막'이 붙고
+   탑이 줄어들면 '마지막'이 블록과 함께 내려오며 나중에→다음에→먼저 순서로 사라져요 */
+var LAST_SIGN={t:'마지막',c:'#E2683C'};
+var prevSigns=null,prevPoleH=null;
+function signSpec(n,fin){
+  var out=[],i;
+  if(!fin){for(i=0;i<3;i++)out.push({key:'f'+i,i:i,t:SIGNS[i].t,c:SIGNS[i].c});return out}
+  for(i=0;i<Math.min(3,n-1);i++)out.push({key:'f'+i,i:i,t:SIGNS[i].t,c:SIGNS[i].c});
+  if(n>0)out.push({key:'last',i:n-1,t:LAST_SIGN.t,c:LAST_SIGN.c,last:true});
+  return out;
+}
+function renderSigns(box,n,fh){
+  var spec=signSpec(n,S.finalized),animate=!!prevSigns,step=fh+GAP,html='',map={};
+  function el(sp,cls,i){return '<div class="sign'+(sp.last?' last':'')+(cls?' '+cls:'')+'" data-key="'+sp.key+'" style="bottom:'+(i*step)+'px;height:'+fh+'px;--sc:'+sp.c+'"><span>'+sp.t+'</span></div>'}
+  spec.forEach(function(sp){
+    var pv=prevSigns&&prevSigns[sp.key];map[sp.key]=sp;
+    html+=el(sp,animate&&!pv?'sign-in':'',sp.i);
+  });
+  if(animate)for(var k in prevSigns)if(!map[k])html+=el(prevSigns[k],'sign-out',prevSigns[k].i);
+  var top=spec.length?Math.max.apply(0,spec.map(function(x){return x.i})):-1;
+  var poleH=top<0?0:top*step+fh*.75+14;
+  box.innerHTML='<div class="pole" style="height:'+(animate&&prevPoleH!=null?prevPoleH:poleH)+'px"></div>'+html;
+  var pole=box.firstChild;void pole.offsetHeight;pole.style.height=poleH+'px';
+  if(animate)spec.forEach(function(sp){
+    var pv=prevSigns[sp.key];if(!pv||pv.i===sp.i)return;
+    var e=box.querySelector('.sign[data-key="'+sp.key+'"]:not(.sign-out)');if(!e)return;
+    e.style.transition='none';e.style.transform='translateY('+(-(pv.i-sp.i)*step)+'px)';void e.offsetHeight;
+    e.style.transition='transform .6s cubic-bezier(.3,1.35,.5,1)';e.style.transform='';
+  });
+  setTimeout(function(){[].forEach.call(box.querySelectorAll('.sign-out'),function(x){x.remove()})},650);
+  prevSigns=map;prevPoleH=poleH;
+}
 function renderTower(opts){
   opts=opts||{};
   var vp=$('#tower-wrap'),world=$('#world'),tower=$('#tower'),signs=$('#signs');if(!vp)return;
@@ -723,13 +753,12 @@ function renderTower(opts){
   var fromBottom=vp.scrollHeight-vp.scrollTop;
   world.style.height=Math.max(H,contentH)+'px';
   function pos(i){return 'bottom:'+(i*(fh+GAP))+'px;height:'+fh+'px'}
-  var s='<div class="pole" style="height:'+(2*(fh+GAP)+fh*.75+14)+'px"></div>';
-  for(var i=0;i<3;i++)s+='<div class="sign" style="'+pos(i)+';--sc:'+SIGNS[i].c+'"><span>'+SIGNS[i].t+'</span></div>';
-  signs.innerHTML=s;
+  renderSigns(signs,n,fh);
+  var i;
   if(S.finalized&&!n){tower.innerHTML='<div class="celebrate"><div class="cele-emo">🎉</div><div>오늘 시간표를<br>모두 마쳤어요!</div></div>';world.style.height=H+'px';vp.scrollTop=0;updateMore();return}
   var h='';
   for(i=0;i<slots;i++){
-    var it=S.tower[i],num=i>=3?'<span class="fnum">'+(i+1)+'</span>':'';
+    var it=S.tower[i],num=(i>=3&&!(S.finalized&&i===n-1))?'<span class="fnum">'+(i+1)+'</span>':'';
     if(it){var b=getBlock(it.blockId);
       h+='<div class="floor'+(opts.dropIdx===i?' drop':'')+(S.finalized&&i===0?' now':'')+'" data-idx="'+i+'" style="'+pos(i)+'">'+num+blockHTML(b)+(S.finalized?'':'<button class="rm" data-act="rm" data-idx="'+i+'" aria-label="빼기">✕</button>')+'</div>';
     }else{var nx=i===n;h+='<div class="slot'+(nx?' next':'')+'" style="'+pos(i)+'">'+num+(nx?'여기에 쌓아요':'')+'</div>'}

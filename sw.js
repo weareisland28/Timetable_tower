@@ -2,7 +2,7 @@
    - 앱 화면(index.html 등)은 인터넷이 되면 항상 새로 받고, 끊기면 저장해 둔 것을 보여 줘요.
    - Supabase 데이터는 저장하지 않아요(늘 최신 데이터를 써야 하니까요). */
 const CACHE = 'tt-tower-v1';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
+const CORE = ['./', './index.html', './config.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
