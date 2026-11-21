@@ -74,7 +74,7 @@ button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:n
 .sign.last{z-index:2}
 .sign.last span{box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 3px #fff}
 .sign{position:absolute;left:0;right:0;display:flex;align-items:center}
-.sign span{position:relative;display:flex;align-items:center;padding-left:16px;height:62%;min-height:40px;max-height:64px;width:100%;background:var(--sc);color:#fff;font-family:'Jua',sans-serif;font-size:26px;clip-path:polygon(0 0,78% 0,100% 50%,78% 100%,0 100%);box-shadow:inset 0 -4px 0 rgba(0,0,0,.15)}
+.sign span{position:relative;display:flex;align-items:center;padding-left:16px;height:62%;min-height:40px;max-height:64px;width:100%;background:var(--sc);color:var(--sf,#fff);font-family:'Jua',sans-serif;font-size:26px;clip-path:polygon(0 0,78% 0,100% 50%,78% 100%,0 100%);box-shadow:inset 0 -4px 0 rgba(0,0,0,.15)}
 .floor{position:absolute;left:0;right:0}
 .floor .blk{box-shadow:0 6px 0 rgba(0,0,0,.16),inset 0 0 0 2px rgba(0,0,0,.06)}
 .floor .blk-name{font-size:clamp(20px,2.6vh + 8px,34px)}
@@ -384,7 +384,7 @@ label.btn{cursor:pointer}
 .set-preview{background:#fff;border-radius:20px;padding:16px;position:sticky;top:10px}
 .pv-title{font-family:'Jua',sans-serif;font-size:17px;margin-bottom:10px;color:var(--muted)}
 .pv-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.pv-sign{background:var(--sc);color:#fff;font-family:'Jua',sans-serif;font-size:15px;padding:6px 20px 6px 10px;clip-path:polygon(0 0,85% 0,100% 50%,85% 100%,0 100%);min-width:110px}
+.pv-sign{background:var(--sc);color:var(--sf,#fff);font-family:'Jua',sans-serif;font-size:15px;padding:6px 20px 6px 10px;clip-path:polygon(0 0,85% 0,100% 50%,85% 100%,0 100%);min-width:110px}
 .pv-sign.empty{background:#ECE8DF;color:#9A927F}
 .pv-blk{flex:1;background:#F3EFE6;border-radius:10px;padding:8px 10px;font-size:14px}
 @media (max-width:820px){
@@ -394,6 +394,18 @@ label.btn{cursor:pointer}
   .tower-wrap:not(.hz) .world{grid-template-columns:110px minmax(0,1fr)}
   .set-wrap{grid-template-columns:1fr}
 }
+
+/* ===== v6: 표지판 색 고르기 ===== */
+.w-n.cpick{position:relative;cursor:pointer;box-shadow:0 0 0 2px #fff,0 0 0 4px #DDE3EA;transition:transform .1s}
+.w-n.cpick:active{transform:scale(.94)}
+.w-n.cpick input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0}
+.w-n.cpick::after{content:'🎨';position:absolute;right:-8px;bottom:-8px;font-size:11px;background:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.w-n.cpick.big{width:52px;height:52px;font-size:20px;border-radius:14px}
+.nc-grid{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0 10px;max-height:260px;overflow-y:auto;padding:8px}
+.nc-btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rb-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.rb-row span{width:40px;height:40px;border-radius:10px;font-family:'Jua',sans-serif;display:flex;align-items:center;justify-content:center}
+.rb-row em{font-style:normal;color:var(--muted);font-size:14px}
 </style>
 <!-- Supabase 연결 정보는 config.js 파일에 있어요 (index.html을 업데이트해도 그대로 유지돼요) -->
 <script src="config.js"></script>
@@ -769,7 +781,9 @@ function renderPick(){
 
 /* ================= 학생 화면 ================= */
 /* ----- 학생별 화면 설정 ----- */
-var DEFAULT_SET={layout:'up',signStyle:'words',words:['먼저','다음에','나중에'],lastLabel:'마지막',numFormat:'num'};
+var RAINBOW=['#E53935','#FB8C00','#FDD835','#43A047','#1E88E5','#3949AB','#8E24AA'];
+var DEFAULT_NUM_COLORS=['#2E9E6A','#3B7DD8','#8A5CC9','#C9822E','#2E8F9E','#B0507A'];
+var DEFAULT_SET={layout:'up',signStyle:'words',words:['먼저','다음에','나중에'],wordColors:['#2E9E6A','#3B7DD8','#8A5CC9'],lastLabel:'마지막',lastColor:'#E2683C',numFormat:'num',numColorMode:'custom',numSolid:'#3B7DD8',numColors:DEFAULT_NUM_COLORS.slice()};
 var WORD_COLORS=['#2E9E6A','#3B7DD8','#8A5CC9','#C9822E','#2E8F9E','#B0507A','#5B7083','#7A9E2E'];
 var LAST_COLOR='#E2683C';
 function normSettings(x){
@@ -778,8 +792,22 @@ function normSettings(x){
   if(['words','number'].indexOf(x.signStyle)>=0)s.signStyle=x.signStyle;
   if(Array.isArray(x.words))s.words=x.words.map(function(w){return String(w||'').trim().slice(0,12)}).filter(function(w){return w}).slice(0,8);
   if(typeof x.lastLabel==='string')s.lastLabel=x.lastLabel.trim().slice(0,12);
+  if(Array.isArray(x.words)&&Array.isArray(x.wordColors)){
+    var wc=[];x.words.forEach(function(w,i){if(String(w||'').trim())wc.push(x.wordColors[i])});
+    s.wordColors=wc.slice(0,8).map(function(c,i){return /^#[0-9a-fA-F]{6}$/.test(c||'')?c:WORD_COLORS[i%WORD_COLORS.length]});
+  }else if(Array.isArray(x.words))s.wordColors=s.words.map(function(w,i){return WORD_COLORS[i%WORD_COLORS.length]});
+  if(/^#[0-9a-fA-F]{6}$/.test(x.lastColor||''))s.lastColor=x.lastColor;
+  if(['rainbow','solid','custom'].indexOf(x.numColorMode)>=0)s.numColorMode=x.numColorMode;
+  if(/^#[0-9a-fA-F]{6}$/.test(x.numSolid||''))s.numSolid=x.numSolid;
+  if(Array.isArray(x.numColors)&&x.numColors.length)s.numColors=x.numColors.slice(0,99).map(function(c,i){return /^#[0-9a-fA-F]{6}$/.test(c||'')?c:DEFAULT_NUM_COLORS[i%DEFAULT_NUM_COLORS.length]});
   if(['num','ordinal','activity'].indexOf(x.numFormat)>=0)s.numFormat=x.numFormat;
   return s;
+}
+function wordColor(st,i){return (st.wordColors&&st.wordColors[i])||WORD_COLORS[i%WORD_COLORS.length]}
+function numColor(st,ord){
+  if(st.numColorMode==='rainbow')return RAINBOW[(ord-1)%RAINBOW.length];
+  if(st.numColorMode==='solid')return st.numSolid;
+  var a=st.numColors&&st.numColors.length?st.numColors:DEFAULT_NUM_COLORS;return a[(ord-1)%a.length];
 }
 function getSettings(sid){var st=getStudent(sid);return normSettings(st&&st.settings)}
 function curSet(){return getSettings(deviceSid)}
@@ -835,20 +863,20 @@ var prevSigns=null,prevPoleH=null;
 function signSpec(n,fin,st){
   var out=[],i;
   if(st.signStyle==='number'){
-    for(i=0;i<n;i++){var it=S.tower[i],ord=fin&&it.ord?it.ord:i+1;out.push({key:'u'+it.uid,i:i,t:numLabel(ord,st.numFormat),c:WORD_COLORS[(ord-1)%WORD_COLORS.length]})}
+    for(i=0;i<n;i++){var it=S.tower[i],ord=fin&&it.ord?it.ord:i+1;out.push({key:'u'+it.uid,i:i,t:numLabel(ord,st.numFormat),c:numColor(st,ord)})}
     return out;
   }
   var w=st.words,k=w.length;
-  if(!fin){for(i=0;i<k;i++)out.push({key:'f'+i,i:i,t:w[i],c:WORD_COLORS[i%WORD_COLORS.length]});return out}
+  if(!fin){for(i=0;i<k;i++)out.push({key:'f'+i,i:i,t:w[i],c:wordColor(st,i)});return out}
   var lastOn=!!st.lastLabel&&n>0,upto=lastOn?n-1:n;
-  for(i=0;i<Math.min(k,upto);i++)out.push({key:'f'+i,i:i,t:w[i],c:WORD_COLORS[i%WORD_COLORS.length]});
-  if(lastOn)out.push({key:'last',i:n-1,t:st.lastLabel,c:LAST_COLOR,last:true});
+  for(i=0;i<Math.min(k,upto);i++)out.push({key:'f'+i,i:i,t:w[i],c:wordColor(st,i)});
+  if(lastOn)out.push({key:'last',i:n-1,t:st.lastLabel,c:st.lastColor||LAST_COLOR,last:true});
   return out;
 }
 function lenCls(t){var l=String(t).length;return l<=3?'':l<=5?' s-mid':' s-long'}
 function renderSigns(box,n,g,st){
   var spec=signSpec(n,S.finalized,st),animate=!!prevSigns,html='',map={};
-  function el(sp,cls,i){return '<div class="sign'+(sp.last?' last':'')+(cls?' '+cls:'')+'" data-key="'+esc(sp.key)+'" style="'+g.pos(i)+';--sc:'+sp.c+'"><span>'+esc(sp.t)+'</span></div>'}
+  function el(sp,cls,i){return '<div class="sign'+(sp.last?' last':'')+(cls?' '+cls:'')+'" data-key="'+esc(sp.key)+'" style="'+g.pos(i)+';--sc:'+sp.c+';--sf:'+fgFor(sp.c)+'"><span>'+esc(sp.t)+'</span></div>'}
   spec.forEach(function(sp){var pv=prevSigns&&prevSigns[sp.key];map[sp.key]=sp;html+=el(sp,animate&&!pv?'sign-in':'',sp.i)});
   if(animate)for(var k in prevSigns)if(!map[k])html+=el(prevSigns[k],'sign-out',prevSigns[k].i);
   var ml=Math.max.apply(0,[0].concat(spec.map(function(x){return String(x.t).length})));
@@ -1207,16 +1235,17 @@ var WORD_PRESETS=[
   {words:['먼저','다음에'],last:''}
 ];
 function settingsPreview(s){
-  var demo=5,parts=[];
+  var demo=s.signStyle==='number'&&s.numColorMode==='custom'?Math.min(Math.max(5,s.numColors.length),12):5,parts=[];
   for(var i=0;i<demo;i++){
-    var t='';
-    if(s.signStyle==='number')t=numLabel(i+1,s.numFormat);
-    else if(s.lastLabel&&i===demo-1)t=s.lastLabel;
-    else if(i<s.words.length)t=s.words[i];
-    parts.push('<div class="pv-row"><span class="pv-sign'+(t?'':' empty')+'" style="--sc:'+(s.signStyle==='words'&&s.lastLabel&&i===demo-1?LAST_COLOR:WORD_COLORS[i%WORD_COLORS.length])+'">'+(t?esc(t):'표지판 없음')+'</span><span class="pv-blk">'+(i+1)+'번째 블록</span></div>');
+    var t='',c='#ECE8DF';
+    if(s.signStyle==='number'){t=numLabel(i+1,s.numFormat);c=numColor(s,i+1)}
+    else if(s.lastLabel&&i===demo-1){t=s.lastLabel;c=s.lastColor||LAST_COLOR}
+    else if(i<s.words.length&&s.words[i]){t=s.words[i];c=wordColor(s,i)}
+    parts.push('<div class="pv-row"><span class="pv-sign'+(t?'':' empty')+'" style="--sc:'+c+';--sf:'+fgFor(c)+'">'+(t?esc(t):'표지판 없음')+'</span><span class="pv-blk">'+(i+1)+'번째 블록</span></div>');
   }
-  return '<div class="pv-title">완성했을 때 (블록 5개 예시)</div>'+parts.join('');
+  return '<div class="pv-title">완성했을 때 (블록 '+demo+'개 예시)</div>'+parts.join('');
 }
+function colorBox(attr,c,label,cls){return '<label class="w-n cpick'+(cls?' '+cls:'')+'" style="background:'+c+';color:'+fgFor(c)+'" title="눌러서 색 바꾸기">'+label+'<input type="color" '+attr+' value="'+c+'"></label>'}
 function renderSettingsTab(){
   var m=$('#t-main');if(!m)return;
   if(!students.length){m.innerHTML='<div class="t-blank"><div class="em">👧</div><div>학생이 없어요.<br>👧 학생 관리에서 학생을 추가해 주세요.</div></div>';return}
@@ -1227,14 +1256,20 @@ function renderSettingsTab(){
   var wordsHTML='';
   if(d.signStyle==='words'){
     wordsHTML='<div class="sub"><div class="lbl2">표지판 문구 (아래부터 순서대로)</div>'+
-      d.words.map(function(w,i){return '<div class="w-row"><span class="w-n" style="background:'+WORD_COLORS[i%WORD_COLORS.length]+'">'+(i+1)+'</span><input class="txt w-in" data-wi="'+i+'" maxlength="12" value="'+esc(w)+'"><button class="btn ghost-btn" data-act="s-wdel" data-v="'+i+'">✕</button></div>'}).join('')+
+      d.words.map(function(w,i){return '<div class="w-row">'+colorBox('data-wc="'+i+'"',wordColor(d,i),String(i+1))+'<input class="txt w-in" data-wi="'+i+'" maxlength="12" value="'+esc(w)+'"><button class="btn ghost-btn" data-act="s-wdel" data-v="'+i+'">✕</button></div>'}).join('')+
       (d.words.length<8?'<button class="btn" data-act="s-wadd">＋ 표지판 추가</button>':'')+
-      '<div class="w-row last-row"><span class="w-n" style="background:'+LAST_COLOR+'">끝</span><button class="switch'+(d.lastLabel?' on':'')+'" data-act="s-lasttog"><span class="trk"></span><b>'+(d.lastLabel?'ON':'OFF')+'</b></button>'+(d.lastLabel?'<input class="txt w-in" id="s-last" maxlength="12" value="'+esc(d.lastLabel)+'">':'<span class="help">마지막 표지판을 쓰지 않아요</span>')+'</div>'+
-      '<div class="help">\'마지막\' 표지판은 완성 후 맨 위(마지막) 블록에 붙어요. 블록이 줄어들면 함께 내려오며 다른 표지판이 하나씩 사라져요.</div>'+
+      '<div class="w-row last-row">'+colorBox('id="s-lastc"',d.lastColor||LAST_COLOR,'끝')+'<button class="switch'+(d.lastLabel?' on':'')+'" data-act="s-lasttog"><span class="trk"></span><b>'+(d.lastLabel?'ON':'OFF')+'</b></button>'+(d.lastLabel?'<input class="txt w-in" id="s-last" maxlength="12" value="'+esc(d.lastLabel)+'">':'<span class="help">마지막 표지판을 쓰지 않아요</span>')+'</div>'+
+      '<div class="help">🎨 번호가 적힌 색 네모를 누르면 그 표지판의 색을 바꿀 수 있어요. \'마지막\' 표지판은 완성 후 맨 위(마지막) 블록에 붙어요. 블록이 줄어들면 함께 내려오며 다른 표지판이 하나씩 사라져요.</div>'+
       '<div class="lbl2" style="margin-top:14px">빠르게 고르기</div><div class="chips">'+WORD_PRESETS.map(function(p,i){return '<button data-act="s-preset" data-v="'+i+'">'+esc(p.words.join('-')+(p.last?'-'+p.last:''))+'</button>'}).join('')+'</div></div>';
   }else{
     wordsHTML='<div class="sub"><div class="lbl2">숫자 표시 방법</div><div class="seg">'+seg('s-numf','num',d.numFormat,'1, 2, 3')+seg('s-numf','ordinal',d.numFormat,'첫 번째, 두 번째')+seg('s-numf','activity',d.numFormat,'1번 활동, 2번 활동')+'</div>'+
-      '<div class="help">블록마다 몇 번째 활동인지 붙어요. [다 했어요]를 누르면 그 블록의 번호 표지판도 함께 사라져요.</div></div>';
+      '<div class="help">블록마다 몇 번째 활동인지 붙어요. [다 했어요]를 누르면 그 블록의 번호 표지판도 함께 사라져요.</div>'+
+      '<div class="lbl2" style="margin-top:16px">🎨 표지판 색깔 설정</div><div class="seg">'+seg('s-ncm','rainbow',d.numColorMode,'🌈 무지개 색 반복','빨주노초파남보')+seg('s-ncm','solid',d.numColorMode,'⬛ 단색','모두 같은 색')+seg('s-ncm','custom',d.numColorMode,'🎨 개별 숫자 색깔','번호마다 직접')+'</div>'+
+      (d.numColorMode==='rainbow'?'<div class="rb-row">'+RAINBOW.map(function(c,i){return '<span style="background:'+c+';color:'+fgFor(c)+'">'+(i+1)+'</span>'}).join('')+'<em>→ 8번부터 다시 빨강</em></div>':'')+
+      (d.numColorMode==='solid'?'<div class="w-row" style="margin-top:10px">'+colorBox('id="s-nsolid"',d.numSolid,'')+'<div class="swatches">'+SWATCHES.concat(['#2E9E6A','#3B7DD8','#E2683C','#2B2D33']).map(function(c){return '<button class="'+(d.numSolid.toUpperCase()===c.toUpperCase()?'on':'')+'" style="background:'+c+'" data-act="s-nsolid" data-v="'+c+'"></button>'}).join('')+'</div></div>':'')+
+      (d.numColorMode==='custom'?'<div class="nc-grid">'+d.numColors.map(function(c,i){return colorBox('data-nc="'+i+'"',c,String(i+1),'big')}).join('')+'</div>'+
+        '<div class="nc-btns">'+(d.numColors.length<99?'<button class="btn" data-act="s-ncadd">＋ 표지판 추가</button>':'')+(d.numColors.length>1?'<button class="btn ghost-btn" data-act="s-ncdel">－ 마지막 칸 빼기</button>':'')+'<span class="help">'+d.numColors.length+'개 설정됨 (최대 99개) · 정한 개수보다 활동이 많으면 1번 색부터 다시 써요</span></div>':'')+
+      '</div>';
   }
   m.innerHTML='<div class="set-wrap"><div class="set-main">'+
     '<h2 style="margin:0 0 6px">🎛️ 화면 설정</h2><p class="lv-note">학생마다 시간표 모양과 표지판을 다르게 정할 수 있어요.</p>'+
@@ -1338,9 +1373,13 @@ document.addEventListener('click',function(e){
     case 's-layout':T.sdraft.layout=v;renderSettingsTab();break;
     case 's-style':T.sdraft.signStyle=v;renderSettingsTab();break;
     case 's-numf':T.sdraft.numFormat=v;renderSettingsTab();break;
-    case 's-wdel':T.sdraft.words.splice(+v,1);renderSettingsTab();break;
-    case 's-wadd':T.sdraft.words.push('');renderSettingsTab();setTimeout(function(){var ins=document.querySelectorAll('.w-in[data-wi]');if(ins.length)ins[ins.length-1].focus()},50);break;
+    case 's-wdel':T.sdraft.words.splice(+v,1);T.sdraft.wordColors.splice(+v,1);renderSettingsTab();break;
+    case 's-wadd':T.sdraft.wordColors[T.sdraft.words.length]=WORD_COLORS[T.sdraft.words.length%WORD_COLORS.length];T.sdraft.words.push('');renderSettingsTab();setTimeout(function(){var ins=document.querySelectorAll('.w-in[data-wi]');if(ins.length)ins[ins.length-1].focus()},50);break;
     case 's-lasttog':T.sdraft.lastLabel=T.sdraft.lastLabel?'':'마지막';renderSettingsTab();break;
+    case 's-ncm':T.sdraft.numColorMode=v;renderSettingsTab();break;
+    case 's-nsolid':T.sdraft.numSolid=v;renderSettingsTab();break;
+    case 's-ncadd':(function(){var a=T.sdraft.numColors;if(a.length>=99)return;a.push(DEFAULT_NUM_COLORS[a.length%DEFAULT_NUM_COLORS.length]);renderSettingsTab()})();break;
+    case 's-ncdel':if(T.sdraft.numColors.length>1){T.sdraft.numColors.pop();renderSettingsTab()}break;
     case 's-preset':(function(){var pr=WORD_PRESETS[+v];if(!pr)return;T.sdraft.words=pr.words.slice();T.sdraft.lastLabel=pr.last;renderSettingsTab()})();break;
     case 's-save':saveStudentSettings([T.sSel]);break;
     case 's-saveall':saveStudentSettings(students.map(function(x){return x.id}));break;
@@ -1394,6 +1433,15 @@ document.addEventListener('submit',function(e){
 });
 document.addEventListener('input',function(e){
   var t=e.target,d=T.draft;if(!d&&!T.sdraft)return;
+  if(T.sdraft&&t.type==='color'&&(t.dataset.wc!=null||t.dataset.nc!=null||t.id==='s-lastc'||t.id==='s-nsolid')){
+    var cv=t.value;
+    if(t.dataset.wc!=null)T.sdraft.wordColors[+t.dataset.wc]=cv;
+    else if(t.dataset.nc!=null)T.sdraft.numColors[+t.dataset.nc]=cv;
+    else if(t.id==='s-lastc')T.sdraft.lastColor=cv;
+    else T.sdraft.numSolid=cv;
+    var bx=t.parentNode;if(bx){bx.style.background=cv;bx.style.color=fgFor(cv)}
+    updateSettingsPreview();return;
+  }
   if(t.dataset&&t.dataset.wi!=null&&T.sdraft){T.sdraft.words[+t.dataset.wi]=t.value;updateSettingsPreview();return}
   if(t.id==='s-last'&&T.sdraft){T.sdraft.lastLabel=t.value;updateSettingsPreview();return}
   if(t.id==='f-name'){d.name=t.value;updatePreview()}
