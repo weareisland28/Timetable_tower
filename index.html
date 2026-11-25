@@ -406,6 +406,45 @@ label.btn{cursor:pointer}
 .rb-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
 .rb-row span{width:40px;height:40px;border-radius:10px;font-family:'Jua',sans-serif;display:flex;align-items:center;justify-content:center}
 .rb-row em{font-style:normal;color:var(--muted);font-size:14px}
+
+/* ===== v7: 수업 활동 ===== */
+.activity.am{gap:12px}
+.activity.am .act-kind{font-size:40px}
+.activity.am .act-blk{font-size:22px;padding:6px 16px 6px 6px}
+.activity.am .act-blk .im{width:48px;height:48px;font-size:30px}
+.activity.am .analog{width:min(36vh,330px);height:min(36vh,330px)}
+.activity.am .act-timer.both .analog{width:min(32vh,290px);height:min(32vh,290px)}
+.activity.am .dg-time{font-size:clamp(64px,10vw,110px)}
+.ac-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(92vw,900px)}
+.ac-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.ac-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--line);border-radius:99px;padding:3px 14px 3px 3px;font-size:16px;color:#55606E}
+.ac-chip i{font-style:normal;background:var(--sc);color:var(--sf,#fff);font-family:'Jua',sans-serif;font-size:14px;border-radius:99px;padding:3px 10px}
+.ac-chip.done{opacity:.45}
+.ac-chip.cur{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,158,106,.2);color:var(--ink);font-weight:bold}
+.ac-now{display:flex;align-items:center;gap:16px;background:#fff;border:4px solid var(--green);border-radius:26px;padding:12px 30px 12px 12px;box-shadow:0 6px 0 rgba(0,0,0,.08)}
+.ac-sign{background:var(--sc);color:var(--sf,#fff);font-family:'Jua',sans-serif;font-size:28px;padding:10px 34px 10px 18px;clip-path:polygon(0 0,82% 0,100% 50%,82% 100%,0 100%)}
+.ac-name{font-family:'Jua',sans-serif;font-size:clamp(34px,5vw,54px)}
+.ac-banner{position:absolute;top:24px;left:50%;transform:translateX(-50%);z-index:4;background:var(--green);color:#fff;font-family:'Jua',sans-serif;font-size:34px;padding:14px 34px;border-radius:99px;box-shadow:0 10px 30px rgba(0,0,0,.2);pointer-events:none;animation:acBanner 2.6s ease forwards}
+@keyframes acBanner{0%{opacity:0;transform:translate(-50%,-16px) scale(.9)}12%{opacity:1;transform:translate(-50%,0) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+.nc-sign{background:var(--sc);color:var(--sf,#fff);font-size:16px;padding:6px 18px 6px 10px;clip-path:polygon(0 0,82% 0,100% 50%,82% 100%,0 100%);flex:none}
+.lv-acts{display:flex;flex-wrap:wrap;gap:6px;font-size:14px}
+.lv-acts span{background:#F3EFE6;border-radius:99px;padding:3px 10px;color:#55606E}
+.lv-acts span.done{opacity:.5}
+.lv-acts span.cur{background:#E6F5EC;color:#1F7A4D;font-weight:bold;box-shadow:0 0 0 2px var(--green)}
+.ac-fld .ac-count{font-family:'Gowun Dodum',sans-serif;font-size:14px;color:var(--muted);background:#F3EFE6;border-radius:99px;padding:2px 10px}
+.ac-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;background:#F7F9FB;border-radius:16px;padding:8px}
+.ac-n{width:32px;height:32px;border-radius:10px;background:#2B2D33;color:#fff;font-family:'Jua',sans-serif;display:flex;align-items:center;justify-content:center;flex:none}
+.ac-in{flex:1;min-width:180px;font-size:18px;padding:8px 12px}
+.switch.sm{font-size:15px;gap:6px}
+.switch.sm .trk{width:52px;height:30px}
+.switch.sm .trk::after{width:22px;height:22px}
+.switch.sm.on .trk::after{left:26px}
+.ac-min{display:inline-flex;align-items:center;gap:4px;font-size:16px}
+.ac-min .pm{width:36px;height:36px;font-size:20px}
+.ac-mins{width:64px;font-size:18px;padding:6px 4px;text-align:center}
+.ac-manual{font-size:14px;color:var(--muted);background:#fff;border-radius:99px;padding:4px 10px}
+.ac-mv{padding:8px 12px;font-size:16px}
+.ac-mv:disabled{opacity:.3}
 </style>
 <!-- Supabase 연결 정보는 config.js 파일에 있어요 (index.html을 업데이트해도 그대로 유지돼요) -->
 <script src="config.js"></script>
@@ -450,10 +489,12 @@ function defaultBlocks(){
 }
 function cleanBlock(b){
   var im=b.img||{};
-  return {type:b.type==='break'?'break':'class',name:String(b.name||'').slice(0,40),img:{kind:['photo','emoji','none'].indexOf(im.kind)>=0?im.kind:'none',value:String(im.value||'')},color:okColor(b.color),timerOn:!!b.timerOn,minutes:clamp(Math.round(+b.minutes||20),1,60),timerType:['analog','digital','both'].indexOf(b.timerType)>=0?b.timerType:'analog',visible:b.visible!==false,order:+b.order||0};
+  return {type:b.type==='break'?'break':'class',name:String(b.name||'').slice(0,40),img:{kind:['photo','emoji','none'].indexOf(im.kind)>=0?im.kind:'none',value:String(im.value||'')},color:okColor(b.color),timerOn:!!b.timerOn,minutes:clamp(Math.round(+b.minutes||20),1,60),timerType:['analog','digital','both'].indexOf(b.timerType)>=0?b.timerType:'analog',visible:b.visible!==false,order:+b.order||0,
+    acts:(b.type!=='break'&&Array.isArray(b.acts)?b.acts:[]).slice(0,10).map(function(x){x=x||{};return {name:String(x.name||'').slice(0,24),timerOn:!!x.timerOn,minutes:clamp(Math.round(+x.minutes||10),1,60)}}),
+    actStyle:b.actStyle==='number'?'number':'words'};
 }
 function emptySession(){return {tower:[],finalized:false,act:null}}
-function normAct(a){if(!a||!a.uid)return null;return {uid:String(a.uid),blockId:String(a.blockId||''),startedAt:+a.startedAt||0,total:+a.total||0,endAt:+a.endAt||0,pausedRem:(a.pausedRem==null?null:+a.pausedRem)}}
+function normAct(a){if(!a||!a.uid)return null;return {uid:String(a.uid),blockId:String(a.blockId||''),startedAt:+a.startedAt||0,total:+a.total||0,endAt:+a.endAt||0,pausedRem:(a.pausedRem==null?null:+a.pausedRem),ai:(a.ai==null?null:+a.ai)}}
 function normSession(x){x=x||{};return {tower:(Array.isArray(x.tower)?x.tower:[]).filter(function(it){return it&&it.uid&&it.blockId}).map(function(it){var o={uid:String(it.uid),blockId:String(it.blockId)};if(+it.ord>0)o.ord=+it.ord;return o}).slice(0,MAX_FLOORS),finalized:!!x.finalized,act:normAct(x.act),updatedAt:+x.updatedAt||0}}
 function sameSession(a,b){return JSON.stringify([a.tower,a.finalized,a.act])===JSON.stringify([b.tower,b.finalized,b.act])}
 
@@ -755,7 +796,8 @@ function imgInner(b){var im=b.img||{};if(im.kind==='photo'&&im.value)return '<im
 function blockHTML(b,forStudent){
   if(!b)b={name:'(지워진 블록)',color:'#D9E4EC',type:'class',img:{kind:'emoji',value:'❔'}};
   var c=okColor(b.color);
-  var meta=(forStudent?'':'<span class="tag">'+(b.type==='class'?'📚 수업':'🧸 쉬는 시간')+'</span>')+(b.timerOn?'<span class="tag">⏱ '+b.minutes+'분</span>':'');
+  var na=blockActs(b).length,am=actMinutesSum(b);
+  var meta=(forStudent?'':'<span class="tag">'+(b.type==='class'?'📚 수업':'🧸 쉬는 시간')+'</span>')+(na?(am?'<span class="tag">⏱ '+am+'분</span>':'')+(forStudent?'':'<span class="tag">🧩 활동 '+na+'개</span>'):(b.timerOn?'<span class="tag">⏱ '+b.minutes+'분</span>':''));
   return '<div class="blk" style="--c:'+c+';--fg:'+fgFor(c)+'"><div class="blk-img">'+imgInner(b)+'</div><div class="blk-body"><div class="blk-name">'+esc(b.name||'이름 없음')+'</div><div class="blk-meta">'+meta+'</div></div></div>';
 }
 function toast(msg){var t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show')},2200)}
@@ -765,7 +807,24 @@ function showModal(html){closeModal();var d=document.createElement('div');d.clas
 function fmt(ms){var s=Math.ceil(ms/1000),m=Math.floor(s/60);s=s%60;return (m<10?'0':'')+m+':'+(s<10?'0':'')+s}
 function actRem(a){if(!a||!a.total)return null;return a.pausedRem!=null?Math.max(0,a.pausedRem):Math.max(0,a.endAt-Date.now())}
 function actPhase(a){if(!a)return 'none';if(!a.total)return 'free';if(a.pausedRem!=null)return 'pause';return actRem(a)>0?'run':'end'}
-function makeAct(it,b){var now=Date.now(),total=b&&b.timerOn?clamp(+b.minutes||1,1,60)*60000:0;return {uid:it.uid,blockId:it.blockId,startedAt:now,total:total,endAt:now+total,pausedRem:null}}
+/* 수업 활동: 수업 시간 블록 안에서 순서대로 하는 작은 활동들 */
+function blockActs(b){return b&&b.type==='class'&&Array.isArray(b.acts)?b.acts:[]}
+function actMinutesSum(b){return blockActs(b).reduce(function(t,x){return t+(x.timerOn?+x.minutes||0:0)},0)}
+function isActMode(a,b){return !!(a&&a.ai!=null&&blockActs(b).length)}
+function actStep(a,b,ai,now){var x=blockActs(b)[ai],total=x&&x.timerOn?clamp(+x.minutes||1,1,60)*60000:0;return {uid:a.uid,blockId:a.blockId,ai:ai,startedAt:now,total:total,endAt:now+total,pausedRem:null}}
+function advanceAct(a){var b=getBlock(a.blockId),n=blockActs(b).length;return actStep(a,b,Math.min((a.ai||0)+1,n-1),Date.now())}
+function actLabel(st,b,i,n){
+  if(b&&b.actStyle==='number')return {t:numLabel(i+1,st.numFormat),c:numColor(st,i+1)};
+  var k=st.words.length;
+  if(n>1&&i===n-1&&st.lastLabel)return {t:st.lastLabel,c:st.lastColor||LAST_COLOR};
+  if(!k)return {t:String(i+1),c:'#5B7083'};
+  var j=Math.min(i,k-1);return {t:st.words[j],c:wordColor(st,j)};
+}
+function makeAct(it,b){
+  var now=Date.now();
+  if(blockActs(b).length)return actStep(it,b,0,now);
+  var total=b&&b.timerOn?clamp(+b.minutes||1,1,60)*60000:0;return {uid:it.uid,blockId:it.blockId,startedAt:now,total:total,endAt:now+total,pausedRem:null,ai:null};
+}
 
 function renderLoading(msg,sub){view='loading';app.innerHTML='<div class="loading"><div class="spin"></div><div>'+esc(msg||'시간표를 불러오고 있어요…')+'</div>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'}
 
@@ -1043,13 +1102,20 @@ function syncOverlay(oa,na){
   if(view!=='student')return;
   if(!na){closeOverlay();return}
   var fresh=!oa||oa.uid!==na.uid||oa.startedAt!==na.startedAt;
+  if(ov&&ov.act.uid===na.uid&&na.ai!=null&&ov.act.ai!==na.ai){closeOverlay();openOverlay(na,'next');return}
   if(!ov||ov.act.uid!==na.uid||ov.act.startedAt!==na.startedAt){closeOverlay();openOverlay(na,fresh);return}
   ov.act=na;updateTimer();
 }
 function openOverlay(a,withSound){
   var b=getBlock(a.blockId)||{name:'',type:'class',color:'#D9E4EC',img:{}};
-  if(withSound)startSound();
+  if(withSound==='next')transitionSound();else if(withSound)startSound();
   var isClass=b.type==='class',timed=a.total>0,tt=b.timerType||'analog',c=okColor(b.color);
+  var am=isActMode(a,b),acts=blockActs(b),acHTML='';
+  if(am){
+    var st=curSet(),ai=clamp(a.ai,0,acts.length-1),cl=actLabel(st,b,ai,acts.length);
+    acHTML='<div class="ac-wrap"><div class="ac-strip">'+acts.map(function(x,i){var l=actLabel(st,b,i,acts.length);return '<span class="ac-chip'+(i<ai?' done':i===ai?' cur':'')+'"><i style="--sc:'+l.c+';--sf:'+fgFor(l.c)+'">'+esc(l.t)+'</i>'+esc(x.name)+(i<ai?' ✓':'')+'</span>'}).join('')+'</div>'+
+      '<div class="ac-now"><span class="ac-sign" style="--sc:'+cl.c+';--sf:'+fgFor(cl.c)+'">'+esc(cl.t)+'</span><span class="ac-name">'+esc(acts[ai].name)+'</span></div></div>';
+  }
   var kind=isClass?'📚 수업 시간':'🧸 쉬는 시간';
   var timerHTML='';
   if(timed){
@@ -1059,13 +1125,14 @@ function openOverlay(a,withSound){
       (dg?'<div class="digital"><div class="dg-label">남은 시간</div><div class="dg-time" id="dg"></div></div>':'')+'</div>';
   }
   var el=document.createElement('div');
-  el.className='activity '+(timed?'timed':'untimed');
+  el.className='activity '+(timed?'timed':'untimed')+(am?' am':'');
   el.style.setProperty('--c',c);el.style.setProperty('--cd',vivid(c));el.style.setProperty('--fg',fgFor(c));
   el.innerHTML='<button class="act-close" data-act="act-close">✕ 그만하고 돌아가기</button>'+
-    '<div class="act-kind">'+kind+'</div><div class="act-blk"><div class="im">'+imgInner(b)+'</div><span>'+esc(b.name)+'</span></div>'+
-    timerHTML+'<div class="act-msg" id="act-msg"></div><div class="act-actions" id="act-actions"></div><div class="next-card" id="next-card" aria-live="polite"></div>';
+    '<div class="act-kind">'+kind+'</div><div class="act-blk"><div class="im">'+imgInner(b)+'</div><span>'+esc(b.name)+'</span></div>'+acHTML+
+    timerHTML+'<div class="act-msg" id="act-msg"></div><div class="act-actions" id="act-actions"></div><div class="next-card" id="next-card" aria-live="polite"></div>'+
+    (withSound==='next'?'<div class="ac-banner">▶ 다음 활동을 해요!</div>':'');
   document.body.appendChild(el);
-  ov={el:el,act:a,phase:null,timer:null,lvl:0};
+  ov={el:el,act:a,phase:null,timer:null,lvl:0,am:am,last:!am||a.ai>=acts.length-1,adv:false};
   updateTimer(true);
   if(timed)ov.timer=setInterval(function(){updateTimer()},200);
 }
@@ -1079,26 +1146,42 @@ function updateTimer(initial){
     if(dg)dg.innerHTML=fmt(rem).split('').map(function(ch){return '<i'+(ch===':'?' class="colon"':'')+'>'+ch+'</i>'}).join('');
     noticeCheck(rem,initial);
   }
+  // 시간을 정한 활동이 끝나면 다음 활동으로 저절로 넘어가요 (학생 태블릿이 넘겨요)
+  if(ov.am&&!ov.last&&ph==='end'&&!ov.adv&&view==='student'){
+    ov.adv=true;var a0=a;
+    setTimeout(function(){if(!ov||ov.act!==a0||!S.act||S.act.uid!==a0.uid||S.act.ai!==a0.ai||S.act.startedAt!==a0.startedAt)return;var o=S.act;S.act=advanceAct(o);commitSession();syncOverlay(o,S.act)},1000);
+  }
   if(ph!==ov.phase){
-    if(ph==='end'&&ov.phase==='run'&&!initial)endSound();
+    if(ph==='end'&&ov.phase==='run'&&!initial&&ov.last)endSound();
     ov.phase=ph;
     ov.el.classList.toggle('ended',ph==='end');
     var msg=$('#act-msg'),acts=$('#act-actions');
     msg.className='act-msg'+(ph==='pause'?' ov-pause':'');
-    msg.textContent=ph==='end'?'⏰ 시간이 다 되었어요!':ph==='pause'?'⏸ 잠깐 멈췄어요':'';
-    acts.innerHTML=(ph==='end'||ph==='free')?'<button class="big b-soft" data-act="act-back">↩ 돌아가기</button><button class="big b-done" data-act="act-done">✓ 다 했어요</button>':'';
+    msg.textContent=ph==='end'?(ov.am&&!ov.last?'⏰ 시간이 다 되었어요! 다음 활동으로 넘어가요':ov.am?'🎉 수업 활동을 모두 마쳤어요!':'⏰ 시간이 다 되었어요!'):ph==='pause'?'⏸ 잠깐 멈췄어요':'';
+    if(ov.am&&!ov.last)acts.innerHTML=ph==='free'?'<button class="big b-start" data-act="act-next">▶ 다음 활동을 해요</button>':'';
+    else acts.innerHTML=(ph==='end'||ph==='free')?'<button class="big b-soft" data-act="act-back">↩ 돌아가기</button><button class="big b-done" data-act="act-done">✓ 다 했어요</button>':'';
   }
 }
 /* 5분·1분 남았을 때: 작은 알림 소리 + 오른쪽 위에 '다음 활동이에요' (마지막 활동이면 안내하지 않아요) */
 function nextBlockFor(a){var i=-1;S.tower.forEach(function(it,k){if(it.uid===a.uid)i=k});var nx=i>=0?S.tower[i+1]:null;return nx?getBlock(nx.blockId):null}
 function noticeSound(){tone(783.99,0,.6,.11);tone(1046.5,.2,.8,.11)}
+function transitionSound(){tone(659.25,0,.5,.16);tone(880,.16,.8,.16)}
 function noticeCheck(rem,initial){
-  var a=ov.act,th=[300000,60000].filter(function(t){return a.total>t});
+  var a=ov.act,b=getBlock(a.blockId)||{};
+  // 쉬는 시간과 수업 활동은 1분 전에만, 활동 없는 수업 시간은 5분·1분 전에 알려요
+  var th=(ov.am||b.type==='break'?[60000]:[300000,60000]).filter(function(t){return a.total>t});
   var lvl=th.filter(function(t){return rem<=t}).length;
   if(lvl<=ov.lvl)return;ov.lvl=lvl;
-  var nb=nextBlockFor(a),card=$('#next-card');if(!nb||!card)return;
-  var c=okColor(nb.color);
-  card.innerHTML='<div class="nc-time">⏰ '+(rem<=60000?'1분':'5분')+' 남았어요</div><div class="nc-title">다음 활동이에요</div><div class="nc-blk" style="--c:'+c+';--fg:'+fgFor(c)+'"><div class="im">'+imgInner(nb)+'</div><span>'+esc(nb.name)+'</span></div>';
+  var card=$('#next-card');if(!card)return;var inner='';
+  if(ov.am&&!ov.last){
+    var acts=blockActs(b),l=actLabel(curSet(),b,a.ai+1,acts.length),c2=okColor(b.color);
+    inner='<div class="nc-blk" style="--c:'+c2+';--fg:'+fgFor(c2)+'"><span class="nc-sign" style="--sc:'+l.c+';--sf:'+fgFor(l.c)+'">'+esc(l.t)+'</span><span>'+esc(acts[a.ai+1].name)+'</span></div>';
+  }else{
+    var nb=nextBlockFor(a);if(!nb)return;
+    var c=okColor(nb.color);
+    inner='<div class="nc-blk" style="--c:'+c+';--fg:'+fgFor(c)+'"><div class="im">'+imgInner(nb)+'</div><span>'+esc(nb.name)+'</span></div>';
+  }
+  card.innerHTML='<div class="nc-time">⏰ '+(rem<=60000?'1분':'5분')+' 남았어요</div><div class="nc-title">다음 활동이에요</div>'+inner;
   card.classList.remove('show');void card.offsetWidth;card.classList.add('show');
   if(!initial)noticeSound();
 }
@@ -1164,22 +1247,24 @@ function ago(t){if(!t)return '';var s=Math.round((Date.now()-t)/1000);if(s<10)re
 function liveCard(st){
   var s=sessions[st.id]||emptySession(),n=s.tower.length,ph=phaseOf(s),a=s.act;
   var cur=n?getBlock(s.tower[0].blockId):null;
-  livePhases[st.id]=ph;
+  livePhases[st.id]=ph+(a&&a.ai!=null?'#'+a.ai:'');
   var status={idle:'⏳ 아직 시간표를 쌓지 않았어요',build:'🧱 시간표 쌓는 중 · '+n+'층',ready:'✅ 시간표 완성 · 시작 전',fin:'🎉 오늘 시간표를 모두 마쳤어요',act:(cur&&cur.type!=='class'?'🧸 쉬는 시간':'📚 수업 시간')+' 진행 중',pause:'⏸ 잠깐 멈춤',end:'⏰ 시간이 다 되었어요'}[ph];
   var nowHTML='';
   if(s.finalized&&cur){
     var timed=a&&a.total;
+    var lacts=blockActs(cur),lam=isActMode(a,cur);
     nowHTML='<div class="lv-now"><div class="mini">'+blockHTML(cur)+'</div>'+(timed?'<div class="lv-time" data-sid="'+esc(st.id)+'">'+fmt(actRem(a))+'</div>':'')+'</div>'+
+      (lam?'<div class="lv-acts">'+lacts.map(function(x,i){return '<span class="'+(i<a.ai?'done':i===a.ai?'cur':'')+'">'+(i+1)+'. '+esc(x.name)+(i<a.ai?' ✓':'')+'</span>'}).join('')+'</div>':'')+
       (timed?'<div class="lv-bar"><i data-bar="'+esc(st.id)+'" style="width:'+(100*actRem(a)/a.total).toFixed(1)+'%"></i></div>':'');
   }
   var chips=s.tower.map(function(it,i){var b=getBlock(it.blockId)||{name:'?',color:'#D9E4EC'};var c=okColor(b.color);return '<span class="lv-chip'+(s.finalized&&i===0?' cur':'')+'" style="--c:'+c+';--fg:'+fgFor(c)+'"><span class="n">'+(i+1)+'</span>'+esc(b.name)+'</span>'}).join('');
   var sid=esc(st.id),B=function(act,cls,label){return '<button class="btn '+cls+'" data-act="'+act+'" data-id="'+sid+'">'+label+'</button>'};
-  var ctrl='';
+  var ctrl='',nextAct=(a&&cur&&isActMode(a,cur)&&a.ai<blockActs(cur).length-1)?B('t-nextact','go','⏭ 다음 활동'):'';
   if(ph==='build')ctrl=B('t-finalize','primary','⭐ 완성 처리')+B('t-clear','ghost-btn','🧹 비우기');
   else if(ph==='ready')ctrl=B('t-start','go','▶ 시작')+B('t-done','ok','✓ 다 했어요')+B('t-clear','ghost-btn','🧹 비우기');
-  else if(ph==='act')ctrl=(a.total?B('t-pause','warn','⏸ 일시정지')+B('t-plus','ghost-btn','＋1분'):'')+B('t-stop','ghost-btn','⏹ 멈추기')+B('t-done','ok','✓ 다 했어요');
-  else if(ph==='pause')ctrl=B('t-resume','go','▶ 계속')+B('t-plus','ghost-btn','＋1분')+B('t-stop','ghost-btn','⏹ 멈추기')+B('t-done','ok','✓ 다 했어요');
-  else if(ph==='end')ctrl=B('t-plus','ghost-btn','＋1분 더')+B('t-stop','ghost-btn','⏹ 닫기')+B('t-done','ok','✓ 다 했어요');
+  else if(ph==='act')ctrl=nextAct+(a.total?B('t-pause','warn','⏸ 일시정지')+B('t-plus','ghost-btn','＋1분'):'')+B('t-stop','ghost-btn','⏹ 멈추기')+B('t-done','ok','✓ 다 했어요');
+  else if(ph==='pause')ctrl=nextAct+B('t-resume','go','▶ 계속')+B('t-plus','ghost-btn','＋1분')+B('t-stop','ghost-btn','⏹ 멈추기')+B('t-done','ok','✓ 다 했어요');
+  else if(ph==='end')ctrl=nextAct+B('t-plus','ghost-btn','＋1분 더')+B('t-stop','ghost-btn','⏹ 닫기')+B('t-done','ok','✓ 다 했어요');
   else if(ph==='fin')ctrl=B('t-clear','primary','🏗️ 새 시간표');
   return '<div class="lv-card p-'+ph+'"><div class="lv-head"><span class="emo">'+esc(st.emoji)+'</span><b>'+esc(st.name)+'</b><span class="ago" data-ago="'+sid+'">'+ago(s.updatedAt)+'</span></div>'+
     '<div class="lv-status p-'+ph+'">'+status+'</div>'+nowHTML+(chips?'<div class="lv-tower">'+chips+'</div>':'')+(ctrl?'<div class="lv-ctrl">'+ctrl+'</div>':'')+'</div>';
@@ -1192,7 +1277,7 @@ function renderLive(){
 function tickLive(){
   if(view!=='teacher'||T.tab!=='live')return;
   var changed=false;
-  students.forEach(function(st){var s=sessions[st.id]||emptySession();if(phaseOf(s)!==livePhases[st.id])changed=true});
+  students.forEach(function(st){var s=sessions[st.id]||emptySession();if(phaseOf(s)+(s.act&&s.act.ai!=null?'#'+s.act.ai:'')!==livePhases[st.id])changed=true});
   if(changed){renderLive();return}
   students.forEach(function(st){
     var s=sessions[st.id];if(!s)return;var a=s.act;
@@ -1211,6 +1296,7 @@ function teacherOp(op,sid){
   else if(op==='t-resume'){if(!a||a.pausedRem==null)return;a.endAt=now+a.pausedRem;a.pausedRem=null}
   else if(op==='t-plus'){if(!a||!a.total)return;if(a.pausedRem!=null)a.pausedRem+=60000;else a.endAt=Math.max(a.endAt,now)+60000;a.total=Math.max(a.total,actRem(a));}
   else if(op==='t-stop'){s.act=null}
+  else if(op==='t-nextact'){if(!a||a.ai==null)return;var nb2=getBlock(a.blockId);if(a.ai>=blockActs(nb2).length-1)return;s.act=advanceAct(a)}
   else if(op==='t-done'){var f=s.tower.shift();if(f&&a&&a.uid===f.uid)s.act=null}
   else return;
   if(sid===deviceSid&&view!=='student')S=normSession(s);
@@ -1319,22 +1405,41 @@ function renderEditor(){
       '<div class="emoji-grid">'+EMOJIS.map(function(e){return '<button class="'+(im.kind==='emoji'&&im.value===e?'on':'')+'" data-act="d-emoji" data-v="'+esc(e)+'">'+e+'</button>'}).join('')+'</div>'+
     '</div></div></div>'+
     '<div class="fld"><div class="lbl"><span class="num">4</span>블록 색깔</div><div class="swatches">'+SWATCHES.map(function(s){return '<button class="'+(c.toUpperCase()===s?'on':'')+'" style="background:'+s+'" data-act="d-color" data-v="'+s+'" aria-label="색 '+s+'"></button>'}).join('')+'<span class="custom">직접 고르기 <input type="color" id="f-color" value="'+c+'"></span></div></div>'+
-    '<div class="fld"><div class="lbl"><span class="num">5</span>시간 정하기 <button class="switch'+(d.timerOn?' on':'')+'" data-act="d-timer" role="switch" aria-checked="'+(!!d.timerOn)+'"><span class="trk"></span><b>'+(d.timerOn?'ON':'OFF')+'</b></button></div>'+
+    actEditorHTML(d,seg,tt)+
+    (blockActs(d).length?'':'<div class="fld"><div class="lbl"><span class="num">'+(d.type==='class'?6:5)+'</span>시간 정하기 <button class="switch'+(d.timerOn?' on':'')+'" data-act="d-timer" role="switch" aria-checked="'+(!!d.timerOn)+'"><span class="trk"></span><b>'+(d.timerOn?'ON':'OFF')+'</b></button></div>'+
       (d.timerOn?
         '<div class="min-row"><button class="pm" data-act="d-min" data-v="-1">−</button><input type="range" id="f-min" min="1" max="60" step="1" value="'+d.minutes+'"><button class="pm" data-act="d-min" data-v="1">＋</button><span class="min-val" id="min-val">'+d.minutes+'분</span></div>'+
         '<div class="chips">'+[5,10,15,20,30,40,50,60].map(function(m){return '<button class="'+(d.minutes===m?'on':'')+'" data-act="d-minset" data-v="'+m+'">'+m+'분</button>'}).join('')+'</div>'+
         '<div class="sub"><div class="lbl2">⏱ 타이머 모양</div><div class="seg">'+seg('d-ttype','analog',tt,'🕐 아날로그 시계','지나간 시간을 색으로 보여줘요')+seg('d-ttype','digital',tt,'🔢 디지털 시계','남은 시간을 숫자로 보여줘요')+seg('d-ttype','both',tt,'🕐 + 🔢 둘 다 사용','시계와 숫자를 함께 보여줘요')+'</div></div>'
       :'<div class="help">시간을 정하지 않으면 [시작해요]를 눌렀을 때 \''+(d.type==='class'?'수업 시간':'쉬는 시간')+'\' 글자만 화면 가운데에 크게 나와요. (최대 60분까지 정할 수 있어요)</div>')+
-    '</div>'+
-    '<div class="fld"><div class="lbl"><span class="num">6</span>학생 화면에 보이기 <button class="switch'+(d.visible?' on':'')+'" data-act="d-visible" role="switch" aria-checked="'+(!!d.visible)+'"><span class="trk"></span><b>'+(d.visible?'ON':'OFF')+'</b></button></div>'+
+    '</div>')+
+    '<div class="fld"><div class="lbl"><span class="num">'+(d.type==='class'?(blockActs(d).length?6:7):6)+'</span>학생 화면에 보이기 <button class="switch'+(d.visible?' on':'')+'" data-act="d-visible" role="switch" aria-checked="'+(!!d.visible)+'"><span class="trk"></span><b>'+(d.visible?'ON':'OFF')+'</b></button></div>'+
       '<div class="help">'+(d.visible?'학생 화면 왼쪽 블록 목록에 보여요.':'학생에게 보이지 않고 📦 토막 창고에 보관돼요.')+'</div></div>'+
     '<div class="ed-actions"><button class="btn primary" data-act="d-save">💾 저장하기</button><button class="btn ghost-btn" data-act="d-cancel">취소</button>'+(isNew?'':'<div class="spacer"></div><button class="btn danger" data-act="d-del">🗑 블록 지우기</button>')+'</div>';
+}
+function actEditorHTML(d,seg,tt){
+  if(d.type!=='class')return '';
+  var acts=d.acts||[],anyTimed=acts.some(function(x){return x.timerOn});
+  var rows=acts.map(function(x,i){
+    return '<div class="ac-row"><span class="ac-n">'+(i+1)+'</span><input class="txt ac-in" data-ai="'+i+'" maxlength="24" placeholder="활동 이름 (예: 낱말 카드 읽기)" value="'+esc(x.name)+'">'+
+      '<button class="switch sm'+(x.timerOn?' on':'')+'" data-act="d-acttimer" data-v="'+i+'" title="시간 정하기"><span class="trk"></span><b>'+(x.timerOn?'⏱ ON':'OFF')+'</b></button>'+
+      (x.timerOn?'<span class="ac-min"><button class="pm" data-act="d-actmin" data-v="'+i+':-1">−</button><input class="txt ac-mins" type="number" inputmode="numeric" min="1" max="60" data-am="'+i+'" value="'+x.minutes+'"><span>분</span><button class="pm" data-act="d-actmin" data-v="'+i+':1">＋</button></span>':'<span class="ac-manual">직접 넘겨요</span>')+
+      '<button class="btn ghost-btn ac-mv" data-act="d-actup" data-v="'+i+'" title="위로"'+(i?'':' disabled')+'>↑</button><button class="btn ghost-btn ac-mv" data-act="d-actdel" data-v="'+i+'" title="지우기">✕</button></div>';
+  }).join('');
+  return '<div class="fld ac-fld"><div class="lbl"><span class="num">5</span>🧩 수업 활동 구조화 <span class="ac-count">'+(acts.length?'활동 '+acts.length+'개':'아직 없음')+'</span></div>'+
+    '<div class="help" style="margin:0 0 10px">이 수업 시간에 할 활동을 순서대로 넣어요. [시작해요]를 누르면 지금 할 활동이 크게 보여요.<br>⏱ 시간 ON: 시간이 끝나면 다음 활동으로 저절로 넘어가요 (1분 전에 다음 활동 카드가 나와요). · OFF: [다음 활동을 해요] 버튼으로 넘어가요.</div>'+
+    rows+
+    (acts.length<10?'<button class="btn" data-act="d-actadd">＋ 활동 추가</button>':'')+(acts.length?'<span class="help" style="margin-left:10px">'+(anyTimed?'시간을 정한 활동 합계 '+actMinutesSum(d)+'분 · ':'')+'최대 10개</span>':'')+
+    (acts.length?'<div class="sub"><div class="lbl2">활동 순서 표기</div><div class="seg">'+seg('d-actstyle','words',d.actStyle||'words','🔤 first-then','먼저 → 다음에 → … → 마지막')+seg('d-actstyle','number',d.actStyle||'words','🔢 1, 2, 3','숫자로 순서 표시')+'</div><div class="help">표지판 문구와 색은 학생별 🎛️ 화면 설정을 따라요.</div></div>'+
+      (anyTimed?'<div class="sub"><div class="lbl2">⏱ 타이머 모양</div><div class="seg">'+seg('d-ttype','analog',tt,'🕐 아날로그 시계')+seg('d-ttype','digital',tt,'🔢 디지털 시계')+seg('d-ttype','both',tt,'🕐 + 🔢 둘 다')+'</div></div>':''):'')+
+    '</div>';
 }
 function updatePreview(){var p=$('#t-preview');if(p&&T.draft)p.innerHTML=blockHTML(T.draft)}
 function saveDraft(){
   var d=T.draft;d.name=(d.name||'').trim();
   if(!d.name){toast('블록 이름을 적어 주세요');var f=$('#f-name');if(f)f.focus();return}
   if(!d.order)d.order=Date.now();
+  if(d.type==='class'&&d.acts)d.acts.forEach(function(x,i){x.name=String(x.name||'').trim()||('활동 '+(i+1))});
   saveBlock(d);T.selId=d.id;T.draft=clone(getBlock(d.id));T.draft.id=d.id;
   renderBlockList();renderEditor();
   toast(d.visible?'저장했어요 ✓':'저장했어요 · 📦 토막 창고에 있어요');
@@ -1359,6 +1464,7 @@ document.addEventListener('click',function(e){
     case 'done':ac();doDone();break;
     case 'new-day':S=emptySession();commitSession();applyFinUI();break;
     case 'act-close':case 'act-back':S.act=null;closeOverlay();commitSession();break;
+    case 'act-next':(function(){if(!S.act||S.act.ai==null)return;var b0=getBlock(S.act.blockId);if(S.act.ai>=blockActs(b0).length-1)return;var o=S.act;S.act=advanceAct(o);commitSession();syncOverlay(o,S.act)})();break;
     case 'act-done':S.act=null;closeOverlay();doDone();if(!busy)commitSession();break;
     case 'exit-teacher':exitTeacher();break;
     case 'go-login':renderLogin();break;
@@ -1384,7 +1490,7 @@ document.addEventListener('click',function(e){
     case 's-save':saveStudentSettings([T.sSel]);break;
     case 's-saveall':saveStudentSettings(students.map(function(x){return x.id}));break;
     case 's-reset':T.sdraft=clone(DEFAULT_SET);renderSettingsTab();toast('처음 설정으로 바꿨어요. [저장하기]를 눌러야 적용돼요');break;
-    case 't-finalize':case 't-clear':case 't-start':case 't-pause':case 't-resume':case 't-plus':case 't-stop':case 't-done':teacherOp(a,id);break;
+    case 't-nextact':case 't-finalize':case 't-clear':case 't-start':case 't-pause':case 't-resume':case 't-plus':case 't-stop':case 't-done':teacherOp(a,id);break;
     case 'st-add':saveStudent({id:'s'+uid(),name:'학생 '+(students.length+1),emoji:KID_EMOJIS[students.length%KID_EMOJIS.length],order:Date.now()});renderStudentsTab();setTimeout(function(){var ins=document.querySelectorAll('.st-name');if(ins.length){ins[ins.length-1].focus();ins[ins.length-1].select()}},50);break;
     case 'st-emoji':(function(){var s=getStudent(id);if(!s)return;var i=KID_EMOJIS.indexOf(s.emoji);s=Object.assign({},s,{emoji:KID_EMOJIS[(i+1)%KID_EMOJIS.length]});saveStudent(s);renderStudentsTab()})();break;
     case 'st-open':deviceSid=id;lsSet(LS_DEVICE,id);toast('이 기기는 이제 '+(getStudent(id)||{}).name+'의 시간표예요');ssDel(SS_TEACHER);enterStudent();break;
@@ -1394,6 +1500,12 @@ document.addEventListener('click',function(e){
     case 'sel':T.selId=id;T.draft=clone(getBlock(id));T.draft.id=id;renderBlockList();renderEditor();break;
     case 'vis':e.stopPropagation();(function(){var b=getBlock(id);if(!b)return;b=clone(b);b.id=id;b.visible=!b.visible;saveBlock(b);if(d&&d.id===id)d.visible=b.visible;renderBlockList();renderEditor();toast(b.visible?'👀 학생 화면으로 꺼냈어요':'📦 토막 창고로 옮겼어요')})();break;
     case 'd-type':d.type=v;renderEditor();break;
+    case 'd-actadd':d.acts=d.acts||[];if(d.acts.length<10){d.acts.push({name:'',timerOn:true,minutes:10});renderEditor();updatePreview();setTimeout(function(){var ins=document.querySelectorAll('.ac-in');if(ins.length)ins[ins.length-1].focus()},50)}break;
+    case 'd-actdel':d.acts.splice(+v,1);renderEditor();updatePreview();break;
+    case 'd-actup':(function(){var i=+v;if(i<1)return;var x=d.acts[i];d.acts[i]=d.acts[i-1];d.acts[i-1]=x;renderEditor()})();break;
+    case 'd-acttimer':d.acts[+v].timerOn=!d.acts[+v].timerOn;renderEditor();updatePreview();break;
+    case 'd-actmin':(function(){var pr=String(v).split(':'),x=d.acts[+pr[0]];x.minutes=clamp((+x.minutes||10)+(+pr[1]),1,60);renderEditor();updatePreview()})();break;
+    case 'd-actstyle':d.actStyle=v;renderEditor();break;
     case 'd-emoji':d.img={kind:'emoji',value:v};renderEditor();break;
     case 'd-noimg':d.img={kind:'none',value:''};renderEditor();break;
     case 'd-color':d.color=v;renderEditor();break;
@@ -1444,6 +1556,8 @@ document.addEventListener('input',function(e){
   }
   if(t.dataset&&t.dataset.wi!=null&&T.sdraft){T.sdraft.words[+t.dataset.wi]=t.value;updateSettingsPreview();return}
   if(t.id==='s-last'&&T.sdraft){T.sdraft.lastLabel=t.value;updateSettingsPreview();return}
+  if(d&&t.classList&&t.classList.contains('ac-in')){d.acts[+t.dataset.ai].name=t.value;return}
+  if(d&&t.classList&&t.classList.contains('ac-mins')){var mv2=Math.round(+t.value);if(mv2>=1&&mv2<=60){d.acts[+t.dataset.am].minutes=mv2;updatePreview()}return}
   if(t.id==='f-name'){d.name=t.value;updatePreview()}
   else if(t.id==='f-min'){d.minutes=+t.value;var mv=$('#min-val');if(mv)mv.textContent=t.value+'분';[].forEach.call(document.querySelectorAll('.chips button'),function(b){b.classList.toggle('on',+b.dataset.v===d.minutes)});updatePreview()}
   else if(t.id==='f-color'){d.color=t.value;updatePreview()}
@@ -1452,6 +1566,7 @@ document.addEventListener('change',function(e){
   var t=e.target;
   if(t.id==='f-photo'){var f=t.files&&t.files[0];if(!f||!T.draft)return;readImage(f).then(function(url){T.draft.img={kind:'photo',value:url};renderEditor()}).catch(function(){toast('사진을 불러오지 못했어요')})}
   else if(t.id==='f-color'&&T.draft){renderEditor()}
+  else if(t.classList&&t.classList.contains('ac-mins')&&T.draft){var x=T.draft.acts[+t.dataset.am];x.minutes=clamp(Math.round(+t.value)||x.minutes||10,1,60);renderEditor();updatePreview()}
   else if(t.id==='f-clsname'&&CLS){var nm=t.value.trim();if(!nm){t.value=CLS.name;return}CLS.name=nm;var cid=CLS.id;enqueue('classroom',function(){return sb.from('classrooms').update({name:nm}).eq('id',cid)});toast('교실 이름을 바꿨어요');updateConn()}
   else if(t.classList&&t.classList.contains('st-name')){var s=getStudent(t.dataset.sid);var nm=t.value.trim();if(s&&nm&&nm!==s.name){saveStudent(Object.assign({},s,{name:nm}));toast('이름을 바꿨어요')}else if(s&&!nm)t.value=s.name}
 });
